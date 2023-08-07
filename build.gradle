@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
         maven {
             name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            url = "https://maven.minecraftforge.net/"
         }
         maven {
             name = "sonatype"
@@ -22,7 +22,9 @@ buildscript {
 		}
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT"
+		classpath ('com.anatawa12.forge:ForgeGradle:1.2-1.1.+') {
+			changing = true
+		}
 		classpath "de.undercouch:gradle-download-task:3.1.2"
     }
 }
@@ -72,7 +74,7 @@ minecraft {
 repositories {
 	maven {
 		name "Forge" // Applied Energistics
-		url "http://files.minecraftforge.net/maven"
+		url "https://maven.minecraftforge.net/"
 	}
 	maven { // GalacticGreg, YAMCore,..
 		name 'UsrvDE'
@@ -84,7 +86,7 @@ repositories {
 	}
 	maven {
 		name = "chickenbones"
-		url = "http://chickenbones.net/maven/"
+		url = "https://modmaven.dev/codechicken/"
 	}
 	maven {
 		name = "ic2, forestry"
@@ -125,10 +127,10 @@ dependencies {
 
 task getGregTech(type: Download) {
     onlyIf {
-        !file("libs/gregtech-5.09.33.31-dev.jar").exists()
+        !file("libs/gregtech-5.09.43.165.jar").exists()
     }
-    src "http://jenkins.usrv.eu:8080/job/Gregtech-5-Unofficial/397/artifact/build/libs/gregtech-5.09.33.31-dev.jar"
-    dest file("libs/gregtech-5.09.33.31-dev.jar")
+    src "https://github.com/GTNewHorizons/GT5-Unofficial/releases/download/5.09.43.165/gregtech-5.09.43.165-dev.jar"
+    dest file("libs/gregtech-5.09.43.165-dev.jar")
     mustRunAfter "deobfBinJar"
     mustRunAfter "repackMinecraft"
 }
