@@ -22,7 +22,9 @@ The default keybind to open the exporter's GUI is 'k', however you should be abl
 | Thaumcraft 4 | None
 
 ### Building
-Building the mod can be done using the gradle wrapper provided in the repo, with the command `gradlew build`.
+Building the mod can be done using the gradle wrapper provided in the repo.
+
+First, run `./gradlew setupDecompWorkspace`, then run `./gradlew build`.
 
 ### License
 This mod/sourcecode is licensed under the GNU General Public License v3, except where other licenses are included (Forge, FML, and Minecraft for example).

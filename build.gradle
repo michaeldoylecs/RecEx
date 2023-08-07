@@ -86,7 +86,7 @@ repositories {
 	}
 	maven {
 		name = "chickenbones"
-		url = "https://modmaven.dev/codechicken/"
+		url = "https://modmaven.dev/"
 	}
 	maven {
 		name = "ic2, forestry"
