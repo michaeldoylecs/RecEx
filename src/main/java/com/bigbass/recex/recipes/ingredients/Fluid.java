@@ -11,6 +11,9 @@ public class Fluid {
 	/** localizedName */
 	public String lN;
 	
+	/** Image Path */
+	public String iP;
+	
 	public Fluid(){
 		
 	}
@@ -19,5 +22,12 @@ public class Fluid {
 		this.a = amount;
 		this.uN = unlocalizedName;
 		this.lN = fluidName;
+	}
+	
+	public Fluid(int amount, String unlocalizedName, String displayName, String imagePath){
+		this.a = amount;
+		this.uN = unlocalizedName;
+		this.lN = displayName;
+		this.iP = imagePath;
 	}
 }

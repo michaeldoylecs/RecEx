@@ -17,6 +17,7 @@ public class GuiMain extends GuiScreen {
 	private final Color fontColor = new Color(0xFFFFFFFF);
 	private final Color background = new Color(0x000000FF);
 	private GuiButton exportButton;
+	private GuiButton exportImagesButton;
 	
 	public GuiMain(){
 		
@@ -26,8 +27,10 @@ public class GuiMain extends GuiScreen {
 	@Override
 	public void initGui(){
 		exportButton = new GuiButton(0, 50, 50, 200, 20, "Export!");
+		exportImagesButton = new GuiButton(1, 50, 100, 200, 20, "Export Images");
 		
 		this.buttonList.add(exportButton);
+		this.buttonList.add(exportImagesButton);
 	}
 	
 	@Override
@@ -56,8 +59,11 @@ public class GuiMain extends GuiScreen {
 	protected void actionPerformed(GuiButton button){
 		if(button.equals(exportButton)){
 			RecipeExporterMod.log.info("Export Button Pressed!");
-			
-			RecipeExporter.getInst().run();
+			new Thread(RecipeExporter.getInst()::runWithExceptionWrapper).start();
+		}
+		if (button.equals(exportImagesButton)) {
+			RecipeExporterMod.log.info("Export Images Button Pressed.");
+			RecipeExporter.getInst().exportImages();
 		}
 	}
 	

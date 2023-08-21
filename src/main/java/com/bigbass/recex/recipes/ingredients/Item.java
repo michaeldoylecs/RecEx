@@ -11,6 +11,9 @@ public class Item implements IItem {
 	/** localizedName */
 	public String lN;
 	
+	/** Image Path */
+	public String iP;
+	
 	public Item(){
 		
 	}
@@ -19,5 +22,12 @@ public class Item implements IItem {
 		this.a = amount;
 		this.uN = unlocalizedName;
 		this.lN = displayName;
+	}
+	
+	public Item(int amount, String unlocalizedName, String displayName, String imagePath){
+		this.a = amount;
+		this.uN = unlocalizedName;
+		this.lN = displayName;
+		this.iP = imagePath;
 	}
 }

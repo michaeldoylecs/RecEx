@@ -1,5 +1,7 @@
 package com.bigbass.recex.recipes;
 
+import com.bigbass.recex.Logger;
+import com.bigbass.recex.render.RenderDispatcher;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,6 +34,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -39,8 +42,15 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 public class RecipeExporter {
 	
 	private static RecipeExporter instance;
+	private final String exportUniqueIdentifier;
+	private final ImageExporter imageExporter;
 	
-	private RecipeExporter(){}
+	private RecipeExporter(){
+		exportUniqueIdentifier = ZonedDateTime.now(
+			ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("uuuu-MM-dd_HH-mm-ss")
+		);
+		imageExporter = new ImageExporter(getImagesDirectory());
+	}
 	
 	public static RecipeExporter getInst(){
 		if(instance == null){
@@ -48,6 +58,18 @@ public class RecipeExporter {
 		}
 		
 		return instance;
+	}
+	
+	public void exportImages() {
+		File imagesDirectory = getImagesDirectory();
+		File itemImageFile = new File(imagesDirectory.getPath() + "/test.png");
+		try
+		{
+			itemImageFile.createNewFile();
+		} catch (IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -81,7 +103,25 @@ public class RecipeExporter {
 			e.printStackTrace();
 			RecipeExporterMod.log.error("Recipes failed to export!");
 		}
+		
+		Logger.chatMessage("Waiting for image rendering to finish...");
+		imageExporter.sleepUntilJobsComplete();
+		Logger.chatMessage("Images finished rendering.");
 	}
+	
+	public void runWithExceptionWrapper() {
+		try {
+			run();
+		} catch (Exception e) {
+			Logger.chatMessage(
+				EnumChatFormatting.RED
+				+ "Something went wrong while rendering! Check the logs.");
+			throw e;
+		} finally {
+			RenderDispatcher.INSTANCE.setRendererState(RenderDispatcher.RendererState.ERROR);
+		}
+	}
+	
 	
 	/**
 	 * <p>Unlike vanilla recipes, the current schema here groups recipes from each machine together.
@@ -120,6 +160,7 @@ public class RecipeExporter {
 					}
 					
 					gtr.iI.add(item);
+					imageExporter.exportItemImageIfUnique(stack);
 				}
 				
 				// item outputs
@@ -131,6 +172,7 @@ public class RecipeExporter {
 					}
 					
 					gtr.iO.add(item);
+					imageExporter.exportItemImageIfUnique(stack);
 				}
 				
 				// fluid inputs
@@ -142,6 +184,7 @@ public class RecipeExporter {
 					}
 					
 					gtr.fI.add(fluid);
+					imageExporter.exportFluidImageIfUnique(stack);
 				}
 				
 				// fluid outputs
@@ -153,6 +196,7 @@ public class RecipeExporter {
 					}
 					
 					gtr.fO.add(fluid);
+					imageExporter.exportFluidImageIfUnique(stack);
 				}
 				
 				mach.recs.add(gtr);
@@ -180,9 +224,12 @@ public class RecipeExporter {
 				for(ItemStack stack : original.recipeItems){
 					Item item = RecipeUtil.formatRegularItemStack(stack);
 					rec.iI.add(item);
+					imageExporter.exportItemImageIfUnique(stack);
 				}
 				
-				rec.o = RecipeUtil.formatRegularItemStack(original.getRecipeOutput());
+				ItemStack outputItemStack = original.getRecipeOutput();
+				rec.o = RecipeUtil.formatRegularItemStack(outputItemStack);
+				imageExporter.exportItemImageIfUnique(outputItemStack);
 				
 				retRecipes.add(rec);
 			}
@@ -206,13 +253,18 @@ public class RecipeExporter {
 				
 				for(Object stack : original.recipeItems){
 					if(stack instanceof ItemStack){
-						rec.iI.add(RecipeUtil.formatRegularItemStack((ItemStack) stack));
+						ItemStack itemStack = (ItemStack) stack;
+						rec.iI.add(RecipeUtil.formatRegularItemStack(itemStack));
+						imageExporter.exportItemImageIfUnique(itemStack);
 					} else if(stack instanceof net.minecraft.item.Item){
-						rec.iI.add(RecipeUtil.formatRegularItemStack(new ItemStack((net.minecraft.item.Item) stack)));
+						ItemStack itemStack = new ItemStack((net.minecraft.item.Item) stack);
+						rec.iI.add(RecipeUtil.formatRegularItemStack(itemStack));
+						imageExporter.exportItemImageIfUnique(itemStack);
 					}
 				}
 				
 				rec.o = RecipeUtil.formatRegularItemStack(original.getRecipeOutput());
+				imageExporter.exportItemImageIfUnique(original.getRecipeOutput());
 				
 				retRecipes.add(rec);
 			}
@@ -237,30 +289,43 @@ public class RecipeExporter {
 				for(Object input : original.getInput()){
 					if(input instanceof ItemStack) {
 						rec.iI.add(RecipeUtil.formatRegularItemStack((ItemStack) input));
+						imageExporter.exportItemImageIfUnique((ItemStack) input);
 					} else if (input instanceof String){
 						ItemOreDict item = RecipeUtil.parseOreDictionary((String) input);
 						if(item != null){
 							rec.iI.add(item);
 							RecipeExporterMod.log.info("input instanceof String : " + item.dns + ", " + item.ims);
+							List<ItemStack> itemStacks = OreDictionary.getOres((String) input);
+							imageExporter.exportItemImagesIfUnique(itemStacks);
 						}
 					} else if (input instanceof String[]){
 						ItemOreDict item = RecipeUtil.parseOreDictionary((String[]) input);
 						if(item != null){
 							rec.iI.add(item);
 							RecipeExporterMod.log.info("input instanceof String[] : " + item.dns + ", " + item.ims);
+							List<ItemStack> itemStacks = new ArrayList<>();
+							for (String oreDictString : (String[]) input) {
+								itemStacks.addAll(OreDictionary.getOres(oreDictString));
+							}
+							imageExporter.exportItemImagesIfUnique(itemStacks);
 						}
 					} else if (input instanceof net.minecraft.item.Item){
-						rec.iI.add(RecipeUtil.formatRegularItemStack(new ItemStack((net.minecraft.item.Item)input)));
+						ItemStack itemStack = new ItemStack((net.minecraft.item.Item) input);
+						rec.iI.add(RecipeUtil.formatRegularItemStack(itemStack));
+						imageExporter.exportItemImageIfUnique(itemStack);
 					} else if (input instanceof Block){
-						rec.iI.add(RecipeUtil.formatRegularItemStack(new ItemStack((Block)input,1,Short.MAX_VALUE)));
+						ItemStack itemStack = new ItemStack((Block) input, 1, Short.MAX_VALUE);
+						rec.iI.add(RecipeUtil.formatRegularItemStack(itemStack));
+						imageExporter.exportItemImageIfUnique(itemStack);
 					} else if (input instanceof ArrayList<?>) {
 						ArrayList<?> list = (ArrayList<?>) input;
-						if(list != null && list.size() > 0){
+						if(!list.isEmpty()){
 							ItemOreDict item = new ItemOreDict();
 							for(Object listObj : list){
 								if(listObj instanceof ItemStack){
 									ItemStack stack = (ItemStack) listObj;
 									item.ims.add(RecipeUtil.formatRegularItemStack(stack));
+									imageExporter.exportItemImageIfUnique(stack);
 									
 									int[] ids = OreDictionary.getOreIDs(stack);
 									for(int id : ids){
@@ -333,8 +398,11 @@ public class RecipeExporter {
 	}
 	
 	private File getSaveFile(){
-		String dateTime = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("uuuu-MM-dd_HH-mm-ss"));
-		File file = new File(RecipeExporterMod.clientConfigDir.getParent() + "/RecEx-Records/" + dateTime + ".json");
+		File file = new File(RecipeExporterMod.clientConfigDir.getParent()
+			+ "/RecEx-Records/"
+			+ exportUniqueIdentifier
+			+".json"
+		);
 		if(!file.exists()){
 			file.getParentFile().mkdirs();
 			try {
@@ -345,5 +413,16 @@ public class RecipeExporter {
 		}
 		
 		return file;
+	}
+	
+	private File getImagesDirectory() {
+		File imagesDirectory = new File(RecipeExporterMod.clientConfigDir.getParent()
+			+ "/RecEx-Records/images/"
+			+ exportUniqueIdentifier
+		);
+		if (!imagesDirectory.exists()) {
+			imagesDirectory.mkdirs();
+		}
+		return imagesDirectory;
 	}
 }

@@ -76,5 +76,55 @@
       <option name="name" value="chickenbones" />
       <option name="url" value="https://modmaven.dev/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="UsrvDE_3rdParty" />
+      <option name="name" value="UsrvDE_3rdParty" />
+      <option name="url" value="https://jenkins.usrv.de:8082/nexus/content/repositories/thirdparty/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="UsrvDE" />
+      <option name="name" value="UsrvDE" />
+      <option name="url" value="https://jenkins.usrv.de:8082/nexus/content/repositories/releases/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="UsrvDE2" />
+      <option name="name" value="UsrvDE2" />
+      <option name="url" value="https://jenkins.usrv.eu:8080/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://www.ryanliptak.com/maven/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="ic2, forestry" />
+      <option name="name" value="ic2, forestry" />
+      <option name="url" value="https://maven.ic2.player.to/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="OpenComputers" />
+      <option name="name" value="OpenComputers" />
+      <option name="url" value="https://maven.cil.li" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="tterrag" />
+      <option name="name" value="tterrag" />
+      <option name="url" value="https://maven.tterrag.com/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="Mobius Repo" />
+      <option name="name" value="Mobius Repo" />
+      <option name="url" value="https://mobiusstrip.eu/maven" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="GTNH" />
+      <option name="name" value="GTNH" />
+      <option name="url" value="http://jenkins.usrv.eu:8081/nexus/content/repositories/releases/com/github/GTNewHorizons/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="GTNH Maven" />
+      <option name="name" value="GTNH Maven" />
+      <option name="url" value="http://jenkins.usrv.eu:8081/nexus/content/repositories/releases/" />
+    </remote-repository>
   </component>
 </project>

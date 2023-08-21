@@ -1,5 +1,6 @@
 package com.bigbass.recex.recipes.gregtech;
 
+import com.bigbass.recex.recipes.FilePathUtil;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class RecipeUtil {
 		try {
 			item.lN = stack.getDisplayName();
 		} catch(Exception e){}
+		item.iP = FilePathUtil.imageFilePath(stack);
 		
 		return item;
 	}
@@ -51,8 +53,20 @@ public class RecipeUtil {
 				item.lN = GT_LanguageManager.getTranslation(stack.getUnlocalizedName());
 			} catch(Exception e2){}
 		}
+		item.iP = FilePathUtil.imageFilePath(stack);
 		
-		if(item.uN != null && !item.uN.isEmpty() && item.uN.equalsIgnoreCase("gt.integrated_circuit")){ // Programmed Circuit
+		// Programmed Circuit configuration
+		if(item.uN != null && item.uN.equalsIgnoreCase("gt.integrated_circuit")){
+			item = new ItemProgrammedCircuit(item, stack.getItemDamage());
+		}
+		
+		// Bio Circuit configuration
+		if(item.uN != null && item.uN.equalsIgnoreCase("item.BioRecipeSelector")){
+			item = new ItemProgrammedCircuit(item, stack.getItemDamage());
+		}
+		
+		// Breakthrough Circuit configuration
+		if(item.uN != null && item.uN.equalsIgnoreCase("item.T3RecipeSelector")){
 			item = new ItemProgrammedCircuit(item, stack.getItemDamage());
 		}
 		
@@ -71,7 +85,7 @@ public class RecipeUtil {
 		}
 		
 		List<Item> items = searchOreDictionary(name);
-		if(items == null || items.isEmpty()){
+		if(items.isEmpty()){
 			return null;
 		}
 		
@@ -127,6 +141,7 @@ public class RecipeUtil {
 				} catch(Exception e3){}
 			}
 		}
+		fluid.iP = FilePathUtil.imageFilePath(stack);
 		
 		return fluid;
 	}
