@@ -1,8 +1,5 @@
 package com.bigbass.recex;
 
-import com.bigbass.recex.render.Renderer;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
 import java.io.File;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,7 +16,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 public class RecipeExporterMod
 {
 	public static final String MODID = "RecEx";
-	public static final String VERSION = "0.0.1";
+	public static final String VERSION = "0.0.4";
 	
 	public static final Logger log = LogManager.getLogger("RecEx");
 	
